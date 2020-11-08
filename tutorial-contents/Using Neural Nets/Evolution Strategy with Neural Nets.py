@@ -56,25 +56,28 @@ def get_reward(shapes, params, env, ep_max_step, continuous_a, seed_and_id=None,
         params += sign(k_id) * SIGMA * np.random.randn(params.size)
     p = params_reshape(shapes, params)
     # run episode
-    s = env.reset()
-    ep_r = 0.
-    for step in range(ep_max_step):
-        a = get_action(p, s, continuous_a)
-        s, r, done, _ = env.step(a)
-        # mountain car's reward can be tricky
-        if env.spec._env_name == 'MountainCar' and s[0] > -0.1: r = 0.
-        ep_r += r
-        if done: break
-    return ep_r
+    ep_r = []
+
+    for i in range(3):
+        s = env.reset()
+        done = True
+        while done:
+            a = get_action(p, s, continuous_a)
+            s, r, done, _ = env.step(a)
+            if not done:
+                ep_r.append(r)
+
+    return sum(ep_r) / 3
 
 
 def get_action(params, x, continuous_a):
     x = x[np.newaxis, :]
-    x = np.tanh(x.dot(params[0]) + params[1])
-    x = np.tanh(x.dot(params[2]) + params[3])
-    x = x.dot(params[4]) + params[5]
+    for i in range(len(params)-2):
+        x = np.tanh(x.dot(params[i]) + params[i+1])
+        i += 1
+    x = x.dot(params[-2]) + params[-1]
     if not continuous_a[0]: return np.argmax(x, axis=1)[0]      # for discrete action
-    else: return continuous_a[1] * np.tanh(x)[0]                # for continuous action
+    else: return continuous_a[1] * np.tanh(x)[0]   
 
 
 def build_net():
