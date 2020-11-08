@@ -65,7 +65,7 @@ def get_reward(shapes, params, env, ep_max_step, continuous_a, seed_and_id=None,
             a = get_action(p, s, continuous_a)
             s, r, done, _ = env.step(a)
             if not done:
-                ep_r.append(r)                      for not end orientaded eviroments change this part use ep_r[i] += r
+                ep_r.append(r)                      #for not end orientaded eviroments change this part use ep_r[i] += r
 
     return sum(ep_r) / 3
 
