@@ -72,9 +72,8 @@ def get_reward(shapes, params, env, ep_max_step, continuous_a, seed_and_id=None,
 
 def get_action(params, x, continuous_a):
     x = x[np.newaxis, :]
-    for i in range(len(params)-2):
-        x = np.tanh(x.dot(params[i]) + params[i+1])
-        i += 1
+        for i in range((int((len(params)/2)-1))):
+        x = np.tanh(x.dot(params[i+i]) + params[i+i+1])
     x = x.dot(params[-2]) + params[-1]
     if not continuous_a[0]: return np.argmax(x, axis=1)[0]      # for discrete action
     else: return continuous_a[1] * np.tanh(x)[0]   
